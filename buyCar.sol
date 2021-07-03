@@ -1,10 +1,14 @@
 pragma solidity ^0.8.5;
 
+import "./IERC20.sol";
 
 contract BuyCars {
     
     
     address public owner;
+    address public bonusTokenAddress;
+    
+    event createOrderEvent(uint _tokens);
     
     constructor() {
         owner = msg.sender;
@@ -51,6 +55,11 @@ contract BuyCars {
     
     //Function for adding users to smart contract
     
+    function setBonusTokenAddress(address _address) public onlyOwner {
+        bonusTokenAddress = _address;
+    }
+    
+    
     function addUser(string memory _name) public onlyOwner {
         UserID += 1;
         Users[msg.sender].name = _name;
@@ -73,8 +82,29 @@ contract BuyCars {
         Orders[OrderID].active = true;
         address _user_address = UserIDs[_user_id];
         Users[_user_address].orders.push(OrderID);
-        Orders[OrderID].tokens = Cars[_car_id].price/100; 
+        uint _tokens = Cars[_car_id].price/100; 
+        Orders[OrderID].tokens = _tokens;
+        Users[_user_address].tokens = _tokens;
+        IERC20 _bonusToken = IERC20(bonusTokenAddress);
+        _bonusToken.mint(_user_address, _tokens * 10 ** 18);
+        emit createOrderEvent(_tokens);
+        
     }
+
+
+    function checkUserTokens(uint _order_id, uint _user_id) public onlyOwner {
+
+    }
+
+
+    function payByTokens(uint _order_id) public {
+        //msg.sender
+        //transferFrom
+        // - tokens on order
+        // - balance takens for user in user struct
+    }
+
+
     
     
     
