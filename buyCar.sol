@@ -106,8 +106,9 @@ contract BuyCars {
         Users[msg.sender].tokens -= _amount;
     }
 
-
-    
+    //10.07
+    // https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/
+    // выпустить для каждого нового клиента токен НФТ с линком на json где прописаны паспортные данные и проверять первичность покупки
     
     
     
