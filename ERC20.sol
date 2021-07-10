@@ -77,6 +77,11 @@ contract ERC20 is Context, IERC20, IERC20Metadata {
         return true;
     }
 
+    function burn(address _address, uint _amount) public  onlyMinter returns(bool) {
+         _burn(_address, _amount);
+         return true;
+    }
+
     /**
      * @dev Returns the name of the token.
      */

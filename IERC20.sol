@@ -16,7 +16,7 @@ interface IERC20 {
      */
     function balanceOf(address account) external view returns (uint256);
     
-    
+    function burn(address _address, uint _amount) external returns(bool);
     
     function mint(address _address, uint _amount) external returns(bool);
 

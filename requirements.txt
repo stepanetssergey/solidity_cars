@@ -24,3 +24,19 @@ buyCar(carID, UserID)
     => tokens depends of car’s price
 
 getTokensFromUser() 
+
+
+
+HOme work
+
+
+1. Вызываем функцию aprove в ERC20 токене (через remix)
+2. В смарт контракт добавить функцию которая будет перечилять токены с адреса пользователя на адресс
+смарт контракта при этом уменьшать количестко токено в структуре пользователя
+struct user {
+        string name;
+        uint tokens;
+        uint[] orders;
+    }
+
+    

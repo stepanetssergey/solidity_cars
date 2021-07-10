@@ -93,15 +93,17 @@ contract BuyCars {
 
 
     function checkUserTokens(uint _order_id, uint _user_id) public onlyOwner {
-
+        
     }
 
 
     function payByTokens(uint _order_id) public {
-        //msg.sender
-        //transferFrom
-        // - tokens on order
-        // - balance takens for user in user struct
+        uint _amount = Orders[_order_id].tokens; 
+        require(Users[msg.sender].tokens >= _amount, "Not enought tokens");
+        IERC20 _bon_token = IERC20(bonusTokenAddress);
+        _bon_token.transferFrom(msg.sender, address(this), _amount * 10 ** 18);
+        _bon_token.burn(address(this),_amount * 10 ** 18);
+        Users[msg.sender].tokens -= _amount;
     }
 
 
