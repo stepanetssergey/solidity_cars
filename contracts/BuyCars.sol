@@ -1,4 +1,5 @@
 pragma solidity ^0.8.5;
+pragma experimental ABIEncoderV2;
 
 import "./IERC20.sol";
 
@@ -14,6 +15,7 @@ contract BuyCars {
     constructor(address _btkaddr) {
         owner = msg.sender;
         bonusTokenAddress = _btkaddr;
+        accounter = owner;
     }
     
     
@@ -27,12 +29,15 @@ contract BuyCars {
     uint public CarID;
     uint public OrderID;
     uint public ServicesOrderID;
+
+    
     
     struct car {
         uint price;
         string brand;
         string model;
     }
+
     
     struct order {
         uint userID;
@@ -53,6 +58,12 @@ contract BuyCars {
         uint tokens;
         uint[] orders;
     }
+
+    car[] public CarList;
+    user[] public UserList;
+    order[] public OrderList;
+    serviceOrder[] public ServiceOrderList;
+
     
     mapping(address => user) public Users;
     mapping(uint => address) public UserIDs;
@@ -78,6 +89,7 @@ contract BuyCars {
         UserID += 1;
         Users[_userAddress].name = _name;
         UserIDs[UserID] = _userAddress;
+        UserList.push(Users[_userAddress]);
     }
     
     function addCar(string memory _brand, string memory _model, uint _price) public onlyOwner {
@@ -85,8 +97,25 @@ contract BuyCars {
         Cars[CarID].brand = _brand;
         Cars[CarID].model = _model;
         Cars[CarID].price = _price;
+        CarList.push(Cars[CarID]);
     }
-    
+
+    function viewCarsList() public  view returns(car[] memory) {
+        return CarList;
+    }
+
+    function viewUserList() public view returns(user[] memory) {
+        return UserList;
+    }
+
+    function viewOrderList() public view returns(order[] memory) {
+        return OrderList;
+    }
+
+    function viewServiceOrderList() public view returns(serviceOrder[] memory) {
+        return ServiceOrderList;
+    }
+     
     
     function createOrder(uint _car_id, uint _user_id) public onlyOwner {
         OrderID += 1;
@@ -102,6 +131,7 @@ contract BuyCars {
         IERC20 _bonusToken = IERC20(bonusTokenAddress);
         _bonusToken.mint(_user_address, _tokens * 10 ** 18);
         emit createOrderEvent(_tokens);  
+        OrderList.push(Orders[OrderID]);
     }
 
     function createServiceOrder (address _address, uint _price) public onlyOwner {
@@ -109,6 +139,8 @@ contract BuyCars {
         ServicesOrders[ServicesOrderID].userAddress = _address;
         ServicesOrders[ServicesOrderID].price = _price;
         ServicesOrders[ServicesOrderID].date = block.timestamp;
+        ServiceOrderList.push(ServicesOrders[ServicesOrderID]);
+        IERC20(bonusTokenAddress).burn(_address, _price * 10 ** 18);
     }
 
     /*

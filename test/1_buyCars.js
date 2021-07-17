@@ -1,5 +1,5 @@
 const truffleAssert = require('truffle-assertions');
-
+const CarSalonNFT = artifacts.require("CarSalonNFT");
 const BuyCars = artifacts.require("BuyCars");
 const BT = artifacts.require("ERC20");
 
@@ -134,6 +134,28 @@ contract("BuyCars", (accounts) => {
     await truffleAssert.reverts(buyCars.payByTokens(2,{from: accounts[5]}));
     
   });
+
+  it("Check deploy collection CarSalonNFT", async () => {
+     const carsalonnft = await CarSalonNFT.deployed()
+     const nameNFT = await carsalonnft.name()
+     const symbol = await  carsalonnft.symbol()
+     assert.equal(nameNFT, "CarSalon NFT", "Not correct collection name")
+     assert.equal(symbol, "CSNFT")
+
+  })
+
+  it("Check create token (mint add tokenURI", async () => {
+    const carsalonnft = await CarSalonNFT.deployed()
+    await carsalonnft.createClientCardNFT("https://github.com/stepanetssergey/solidity_cars.git")
+    const tokenURI = await carsalonnft.tokenURI(1)
+    assert.equal(tokenURI, "https://github.com/stepanetssergey/solidity_cars.git", "notCorrectURI")
+  })
+
+  it("Check car list", async() => {
+    const buyCars = await BuyCars.deployed();
+    const CarList = await buyCars.viewCarsList()
+    //console.log(CarList)
+  })
 
   
 });
