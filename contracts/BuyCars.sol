@@ -54,6 +54,7 @@ contract BuyCars {
     }
     
     struct user {
+        uint userID;
         string name;
         uint tokens;
         uint[] orders;
@@ -88,8 +89,9 @@ contract BuyCars {
     function addUser(string memory _name, address _userAddress) public onlyOwner {
         UserID += 1;
         Users[_userAddress].name = _name;
-        UserIDs[UserID] = _userAddress;
-        UserList.push(Users[_userAddress]);
+        Users[_userAddress].userID = UserID;
+        UserIDs[UserID] = _userAddress;   // UserIDs [1] <= UserID += 1;
+        UserList.push(Users[_userAddress]); //UserList [0] index = UserID - 1
     }
     
     function addCar(string memory _brand, string memory _model, uint _price) public onlyOwner {
@@ -115,6 +117,17 @@ contract BuyCars {
     function viewServiceOrderList() public view returns(serviceOrder[] memory) {
         return ServiceOrderList;
     }
+
+
+    function changeUsersTokensInList(uint _user_id) internal {
+        user memory _user_for_change = Users[UserIDs[_user_id]];
+        for (uint i; i < UserList.length; i++) {
+
+            if ((i+1) == _user_id) {
+                UserList[i] = _user_for_change;
+            }
+        }
+    }
      
     
     function createOrder(uint _car_id, uint _user_id) public onlyOwner {
@@ -132,6 +145,8 @@ contract BuyCars {
         _bonusToken.mint(_user_address, _tokens * 10 ** 18);
         emit createOrderEvent(_tokens);  
         OrderList.push(Orders[OrderID]);
+
+        changeUsersTokensInList(_user_id);
     }
 
     function createServiceOrder (address _address, uint _price) public onlyOwner {
@@ -141,6 +156,9 @@ contract BuyCars {
         ServicesOrders[ServicesOrderID].date = block.timestamp;
         ServiceOrderList.push(ServicesOrders[ServicesOrderID]);
         IERC20(bonusTokenAddress).burn(_address, _price * 10 ** 18);
+        Users[_address].tokens -= _price;
+        uint _user_id = Users[_address].userID;
+        changeUsersTokensInList(_user_id);
     }
 
     /*
